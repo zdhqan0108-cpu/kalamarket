@@ -1,0 +1,98 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	{% block title %}ثبت نام - کالا مارکت{% endblock %}
+	<link type="text/css" href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet" />
+    <link type="text/css" href="{% static 'assets/css/font-awesome.min.css' %}" rel="stylesheet" />
+    <link type="text/css" href="{% static 'assets/css/util.css' %}" rel="stylesheet" />
+    <link type="text/css" href="{% static 'assets/css/style.css' %}" rel="stylesheet" />
+</head>
+<body class="rtl">
+	<div class="limiter">
+		<div class="container-login100">
+			<div class="wrap-login100">
+<div class="login100-form-title" style="background-image: url('/static/assets/images/cover/images7.jpg');">					<span class="login100-form-title-1" > ثبت نام کنید</span>
+				</div>
+				<form method="post" class="login100-form validate-form">
+					{% csrf_token %}
+					 <!-- نمایش خطاهای فرم (بدون تغییر در کلاس‌های قالب) -->
+  {% if form.errors %}
+ <div style="color: #dc3545; margin-bottom: 15px; font-size: 14px;"> 
+	       {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+                <div>
+                    {% if error == 'This field is required.' %}
+                        این فیلد الزامی است.
+                    {% elif error == 'The two password fields didn’t match.' %}
+                        رمز عبور و تکرار آن مطابقت ندارند.
+                    {% elif error == 'Enter a valid email address.' %}
+                        ایمیل معتبر وارد کنید.
+                    {% elif error == 'A user with that username already exists.' %}
+                        این نام کاربری قبلاً ثبت شده است.
+                    {% elif error == 'This password is too short. It must contain at least 8 characters.' %}
+                        رمز عبور باید حداقل ۸ کاراکتر باشد.
+                    {% elif error == 'This password is too common.' %}
+                        رمز عبور خیلی ساده است.
+                    {% elif error == 'This password is entirely numeric.' %}
+                        رمز عبور نمی‌تواند فقط شامل اعداد باشد.
+                    {% elif error == 'The password is too similar to the username.' %}
+                        رمز عبور نباید شبیه نام کاربری باشد.
+                    {% else %}
+                        {{ error }}
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+{% endif %}
+
+					<div class="wrap-input100 validate-input m-b-26" data-validate="لطفا نام کاربری خود را وارد کنید!">
+						<span class="label-input100">نام کاربری</span>
+						<input class="input100" type="text" name="username" placeholder="نام کاربری خود را وارد کنید"  required >
+						<span class="focus-input100"></span>
+					</div>
+
+					<div class="wrap-input100 validate-input m-b-18" data-validate = "لطفا رمز عبور خود را وارد کنید!">
+						<span class="label-input100">رمز عبور</span>
+						<input class="input100" type="password" name="password1" placeholder="رمز عبور خود را وارد کنید" required>
+						<span class="focus-input100"></span>
+					</div>
+					<div class="wrap-input100 validate-input m-b-18" data-validate = "لطفا رمز عبور خود را وارد کنید!">
+						<span class="label-input100">رمز عبور</span>
+						<input class="input100" type="password" name="password2" placeholder="رمز عبور خود را مجددا وارد کنید" required>
+						<span class="focus-input100"></span>
+					</div>
+					<div class="wrap-input100 validate-input m-b-18" data-validate = "لطفا رمز عبور خود را وارد کنید!">
+						<span class="label-input100"> ایمیل</span>
+						<input class="input100" type="email" name="email" placeholder="ایمیل خود را وارد  کنید" required>
+						<span class="focus-input100"></span>
+					</div>
+
+
+
+					<div class="flex-sb-m w-full p-b-30">
+						<div>
+							
+						</div>
+						<div class="contact100-form-checkbox">
+							<input class="input-checkbox100" id="ckb1" type="checkbox" name="remember-me">
+							
+						</div>
+					</div>
+					<div class="container-login100-form-btn">
+						<button class="login100-form-btn">وارد شوید</button>
+						
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<script src="{% static 'assets/js/jquery-3.1.1.min.js'%}"></script>
+	<script  src="{% static 'assets/js/scripts.js'%}"></script>
+</body><!-- This template has been downloaded from Webrubik.com -->
+</html>

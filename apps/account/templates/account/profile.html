@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}پروفایل کاربری - کالا مارکت{% endblock %}
+{% block content %}
+<style>
+    .form-edit-inline {
+        width: 100%;
+    }
+    .form-row {
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #eee;
+        padding: 10px 0;
+    }
+    .form-row:last-child {
+        border-bottom: none;  /* خط آخرین ردیف را حذف می‌کند */
+    }
+    .form-row .title {
+        width: 30%;
+        font-weight: bold;
+    }
+    .form-row .value {
+        width: 70%;
+    }
+    .input-plain {
+        border: none;
+        background: transparent;
+        width: 100%;
+        padding: 5px 0;
+        font-size: inherit;
+        color: inherit;
+        outline: none;
+    }
+    .input-plain:focus {
+        border-bottom: 1px solid #007bff;
+    }
+    .input-plain {
+    border: none;
+    background: transparent;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    font-size: inherit;
+    font-family: inherit;
+    color: inherit;
+    outline: none;
+}
+.input-plain:focus {
+    border-bottom: 1px solid #007bff;
+}
+</style>
+
+<div class="container-main">
+    <div class="d-block">
+        <section class="profile-home">
+            <div class="col-lg">
+                <div class="post-item-profile order-1 d-block">
+                    <div class="col-lg-3 col-md-3 col-xs-12 pr">
+                        <div class="sidebar-profile sidebar-navigation">
+                            <section class="profile-box">
+                                <header class="profile-box-header-inline">
+                                    <div class="profile-avatar user-avatar profile-img">
+                                        <img src="{% static 'assets/images/man.png'%}">
+                                    </div>
+                                </header>
+                                <footer class="profile-box-content-footer">
+                                    <span class="profile-box-nameuser">{{ user.username }}</span>
+                                    <span class="profile-box-registery-date">عضویت در سایت {{ jalali_date }}</span>
+                                    <span class="profile-box-phone">شماره همراه : {{ user.profile.phone|default:"-" }}</span>
+                                    <div class="profile-box-tabs">
+                                        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="mdi mdi-logout-variant">خروج از حساب</a>
+                                        <form id="logout-form" method="post" action="{% url 'account:logout' %}" style="display: none;">
+                                            {% csrf_token %}
+                                        </form>
+                                    </div>
+                                </footer>
+                            </section>
+                            <section class="profile-box">
+                                <ul class="profile-account-navs">
+                                    <li class="profile-account-nav-item navigation-link-dashboard"><a href="#" class="active"><i class="mdi mdi-account-outline"></i> پروفایل</a></li>
+                                    <li class="profile-account-nav-item navigation-link-dashboard"><a href="{%url 'orders:user_orders' %}"><i class="mdi mdi-cart"></i> همه سفارش ها</a></li>
+                                    <li class="profile-account-nav-item navigation-link-dashboard"><a href="{%url 'catalog:wishlist' %}"><i class="mdi mdi-heart"></i> لیست علاقه مندی</a></li>
+                                    <li class="profile-account-nav-item navigation-link-dashboard"><a href="{%url 'account:address' %}"><i class="mdi mdi-map-outline"></i> آدرس ها</a></li>
+                                </ul>
+                            </section>
+                        </div>
+                    </div>
+                    <div class="col-lg-9 col-md-9 col-xs-12 pl">
+                        <div class="profile-content">
+                            <div class="profile-stats">
+                                <!-- حالت نمایش اطلاعات -->
+                                <div id="display-info">
+                                    <table class="table table-profile">
+                                        <tbody>
+                                            <tr>
+                                                <td class="w-50"><div class="title">نام و نام خانوادگی:</div><div class="value">{{ user.username }}</div></td>
+                                                <td class="w-50"><div class="title">پست الکترونیک :</div><div class="value">{{ user.email }}</div></td>
+                                            </tr>
+                                            <tr>
+                                                <td><div class="title">شماره تلفن همراه:</div><div class="value">{{ user.profile.phone|default:"-" }}</div></td>
+                                                <td><div class="title">تاریخ عضویت:</div><div class="value">{{ jalali_date }}</div></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="profile-edit-action">
+                                        <a href="#" onclick="showEditForm(); return false;" class="link-spoiler-edit btn btn-secondary">ویرایش اطلاعات</a>
+                                    </div>
+                                </div>
+
+                               <!-- حالت ویرایش (مخفی در ابتدا) -->
+<div id="edit-form" style="display: none;">
+    <form method="post" id="edit-profile-form" action="{% url 'account:profile' %}">
+        {% csrf_token %}
+        <table class="table table-profile">
+            <tbody>
+                <tr>
+                    <td class="w-50">
+                        <div class="title">نام و نام خانوادگی:</div>
+                        <div class="value">
+                            <input type="text" name="username" value="{{ user.username }}" class="input-plain">
+                        </div>
+                    </td>
+                    <td class="w-50">
+                        <div class="title">پست الکترونیک :</div>
+                        <div class="value">
+                            <input type="email" name="email" value="{{ user.email }}" class="input-plain">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="title">شماره تلفن همراه:</div>
+                        <div class="value">
+                            <input type="text" name="phone" value="{{ user.profile.phone|default:'' }}" class="input-plain">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="title">تاریخ عضویت:</div>
+                        <div class="value">{{ jalali_date }}</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="profile-edit-action">
+    <a href="#" onclick="document.getElementById('edit-profile-form').submit(); return false;" class="link-spoiler-edit btn btn-primary">ذخیره تغییرات</a>
+    <a href="#" onclick="hideEditForm(); return false;" class="link-spoiler-edit btn btn-secondary">انصراف</a>
+</div>
+    </form>
+</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<script>
+    function showEditForm() {
+        document.getElementById('display-info').style.display = 'none';
+        document.getElementById('edit-form').style.display = 'block';
+    }
+    function hideEditForm() {
+        document.getElementById('display-info').style.display = 'block';
+        document.getElementById('edit-form').style.display = 'none';
+    }
+</script>
+{% endblock %}

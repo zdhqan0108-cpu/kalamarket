@@ -1,0 +1,733 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}جزئیات محصول - کالا مارکت{% endblock %}
+{% load share_tags%}
+{% load humanize %}
+
+{% block content %}
+
+
+<style>
+    .star-rating {
+    direction: rtl;
+    display: inline-block;
+    unicode-bidi: bidi-override;
+}
+.star-rating input {
+    display: none;
+}
+.star-rating label {
+    font-size: 24px;
+    color: #ddd;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label {
+    color: #f5b301;
+}
+/* مخفی کردن دکمه‌های تکراری - فقط اولین جفت دکمه نشان داده بشه */
+.quantity-nav:not(:first-of-type) {
+    display: none !important;
+}
+
+.mask-text {
+    max-height: none !important;
+    overflow: visible !important;
+}
+.mask-handler, .shadow-box {
+    display: none !important;
+}
+.comment-list li:last-child {
+    border-bottom: none !important;
+}
+
+</style>
+
+    <!-- arshive-product---------------------->
+    <div class="container-main">
+        <div class="d-block">
+            <div class="page-content page-row">
+                <div class="main-row">
+                    <div id="breadcrumb">
+                        <i class="mdi mdi-home"></i>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                               <li class="breadcrumb-item"><a href="{% url 'catalog:home' %}">خانه</a></li>
+
+{% if product.category %}
+<li class="breadcrumb-item"><a href="{% url 'catalog:category_products' cat_slug=product.category.slug %}">{{ product.category.title }}</a></li>
+{% endif %}
+
+{% if product.subcategory and product.subcategory.slug %}
+<li class="breadcrumb-item"><a href="{% url 'catalog:subcategory_products' sub_slug=product.subcategory.slug %}">{{ product.subcategory.title }}</a></li>
+{% endif %}
+
+{% if product.brand %}
+<li class="breadcrumb-item"><a href="{% url 'catalog:brand_products' brand_slug=product.brand.slug %}">{{ product.brand.title }}</a></li>
+{% endif %}
+
+{% if product.product_type %}
+<li class="breadcrumb-item"><a href="{% url 'catalog:product_type' pt_slug=product.product_type.slug %}">{{ product.product_type.title }}</a></li>
+{% endif %}
+                                <li class="breadcrumb-item active" aria-current="page">{{ product.title }}</li>
+                            </ol>
+                        </nav>
+                    </div>
+                    
+                    
+                    <div class="col-lg">
+                        <div class="product type-product">
+                            <div class="col-lg-5 col-xs-12 pr d-block" style="padding: 0;">
+                                <section class="product-gallery">
+                                    <div class="gallery">
+                                        <div class="gallery-item">
+                                            <div>
+                                                <ul class="gallery-actions">
+                                                   <li>
+    <a href="#" class="btn-option add-product-wishes" 
+       data-product-id="{{ product.id }}" 
+       id="wishlist-btn"
+       onclick="location.href='{% url 'catalog:toggle_wishlist' product.id %}'">
+        <i class="mdi {% if is_favorited %}mdi-heart{% else %}mdi-heart-outline{% endif %}"></i>
+        <span>محبوب</span>
+    </a>
+</li>
+                                                    <li class="option-social">
+                                                        <a href="#" class="btn-option btn-option-social"
+                                                            data-toggle="modal" data-target="#option-social">
+                                                            <i class="mdi mdi-share"></i>
+                                                            <span>اشتراک</span>
+                                                        </a>
+                                                        <!-- Modal-option-social -->
+                                                        <div class="modal fade" id="option-social" tabindex="-1"
+                                                            role="dialog" aria-labelledby="exampleModalCenterTitle"
+                                                            aria-hidden="true">
+                                                            <div class="modal-dialog modal-dialog-centered"
+                                                                role="document">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title"
+                                                                            id="exampleModalCenterTitle">اشتراک گذاری
+                                                                        </h5>
+                                                                        <button type="button" class="close"
+                                                                            data-dismiss="modal" aria-label="Close">
+                                                                            <span aria-hidden="true">&times;</span>
+                                                                        </button>
+                                                                    </div>
+                                                                    {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-success rounded-pill text-center">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+                                                                    <div class="modal-body">
+                                                                        <div class="title">با استفاده از روش‌های زیر
+                                                                            می‌توانید این صفحه را با دوستان خود به
+                                                                            اشتراک بگذارید.</div>
+                                                                        <form  method="post" action="{% url 'catalog:send_share_email' product.slug %}" class="email-sharing">
+                                                                            {% csrf_token %}
+                                                                            <h5 class="share-title">ارسال از طریق ایمیل
+                                                                            </h5>
+                                                                            <div class="input-group-sharing">
+                                                                                <input type="email" name="email" required class="share-email-address form-control" id="share-email">
+                                                                                <button
+                                                                                    class="btn-send-email btn btn-primary"
+                                                                                    type="submit">ارسال ایمیل</button>
+                                                                            </div>
+                                                                        </form>
+                                                                        <div class="share-options">
+                                                                            <div
+                                                                                class="share-social-buttons text-center">
+                                                                                <a href="https://x.com/intent/tweet?text={{ product.title|urlencode }}&url={{ request.build_absolute_uri|urlencode }}" class="share-social share-social-twitter">
+                                                                                    <i class="mdi mdi-twitter"></i>
+                                                                                </a>
+                                                                                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}"class="share-social share-social-facebook">
+                                                                                    <i class="mdi mdi-facebook"></i>
+                                                                                </a>
+                                                                                <a href="https://wa.me/?text=این محصول رو ببین: {{ request.build_absolute_uri }}" class="share-social share-social-whatsapp">
+                                                                                    <i class="mdi mdi-whatsapp"></i>
+                                                                                </a>
+                                                                                <a href="mailto:?subject={{ product.title|urlencode }}&body={{ request.build_absolute_uri|urlencode }}"
+                                                                                    class="share-social share-social-email-outline">
+                                                                                    <i
+                                                                                        class="mdi mdi-email-outline"></i>
+                                                                                </a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-share-col">
+                                                                            <input class="ui-url-field" type="url"
+                                                                                value="{{ request.build_absolute_uri }}"
+                                                                                readonly="">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="option-alarm">
+                                                        <a href="#" class="btn-option btn-option-alarm"
+                                                            data-toggle="modal" data-target="#btn-option-alarm">
+                                                            <i class="mdi mdi-bell-outline"></i>
+                                                            <span>اطلاع‌رسانی</span>
+                                                        </a>
+                                                        <!-- Modal-option-alarm -->
+                                                        <div class="modal fade" id="btn-option-alarm" tabindex="-1"
+                                                            role="dialog" aria-labelledby="exampleModalCenterTitle"
+                                                            aria-hidden="true">
+                                                            <div class="modal-dialog modal-dialog-centered"
+                                                                role="document">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title"
+                                                                            id="exampleModalCenterTitle">به من اطلاع بده
+                                                                        </h5>
+                                                                        <button type="button" class="close"
+                                                                            data-dismiss="modal" aria-label="Close">
+                                                                            <span aria-hidden="true">&times;</span>
+                                                                        </button>
+                                                                    </div>
+                                                                   <div class="modal-body">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-success text-center">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <form method="post" action="{% url 'catalog:notify_me' product.id %}">
+                        {% csrf_token %}
+                        <!-- فرمت همینجوری که هست -->
+                        <div class="mb-2 d-flex align-items-center">
+                            <input class="me-2" type="radio" name="method" value="email" id="notify_email" checked>
+                            <label for="notify_email">ایمیل به {{ user.email }}</label>
+                        </div>
+                        <div class="mb-2 d-flex align-items-center">
+                            <input class="me-2" type="radio" name="method" value="sms" id="notify_sms">
+                            <label for="notify_sms">پیامک به {{ user.profile.phone }}</label>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">ثبت</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">بازگشت</button>
+                        </div>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+                                                              
+                                                    </li>
+                                                    
+                                                        
+                                                    <li class="Three-dimensional">
+  <a href="#" onclick="window.location.href='/compare/'; return false;" class="btn-option btn-compare">
+    <i class="mdi mdi-compare"></i>
+    <span>مقایسه</span>
+</a>
+</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="gallery-item">
+    <div class="gallery-img">
+        <a href="#">
+          <img id="main-product-image" 
+     src="{% if selected_variant and selected_variant.image %}{{ selected_variant.image.url }}{% else %}{{ product.image.url }}{% endif %}" 
+     class="img-fluid" 
+     alt="{{ product.title }}" 
+     width="400"/>
+
+            <div id="gallery_01f" style="width:420px;float:right;">
+        </a>
+        <ul class="gallery-items owl-carousel owl-theme" id="gallery-slider">
+            <!-- اینجا فقط حلقه زده شده، بقیه چیزا عیناً مثل قبل -->
+          
+        </ul>
+    </div>
+</div>
+                            </div>
+                            </section>
+                        </div>
+                        <div class="col-lg-7 col-xs-12 pl mt-5 d-block">
+                            <section class="product-info">
+                                <div class="product-headline">
+                                    <h1 class="product-title">
+{{ product.title}}                                    </h1>
+                                    <div class="product-guaranteed text-success">
+                                    
+                                        <span></span>
+                                    </div>
+                                </div>
+                                <div class="product-attributes">
+                                    <div class="product-config">
+                                        <span class="product-title-en">
+                                        </span>
+                                        <div class="product-rate">
+    {% with avg_rating|default:0 as rate %}
+        {% for i in "12345"|make_list %}
+            {% if forloop.counter <= rate %}
+                <i class="fa fa-star active"></i>
+            {% else %}
+                <i class="fa fa-star"></i>
+            {% endif %}
+        {% endfor %}
+    {% endwith %}
+<span class="rating-count text-muted" style="margin-right:15px;">({{ product.reviews.count }} نظر)</span>
+</div>
+                                    </div>
+                                </div>
+                                <div class="product-config-wrapper">
+                                    <div class="product-directory">
+                                       
+                                    </div>
+                                    <div class="col=lg-6 col-md-6 col-xs-12 pr">
+                                     <!-- ====================  بخش سمت راست محصول (قیمت، موجودی، رنگ‌بندی، عکس) ==================== -->
+
+
+
+<!-- عکس اصلی با id مشخص -->
+
+<!-- رنگ‌بندی (داینامیک از دیتابیس) -->
+<!-- رنگ بندی -->
+<div class="product-variants">
+    {% if product.variants.exists %}
+        <span>رنگ بندی: </span>
+        <ul class="js-product-variants">
+            {% for variant in product.variants.all %}
+            <li class="ui-variant">
+                <label for="variant_{{ variant.id }}" class="ui-variant-color">
+                    <span class="ui-variant-shape"
+                        style="background-color: 
+                            {% if variant.color == 'مشکی' %}#4e4c4c
+                            {% elif variant.color == 'آبی' %}#56abef
+                            {% elif variant.color == 'بنفش' %}#a97eca
+                            {% else %}#cccccc{% endif %}">
+                    </span>
+                    <input type="radio" name="color" value="{{ variant.id }}" id="variant_{{ variant.id }}"
+    onchange="location.href='?color={{ variant.id }}'"
+    {% if selected_variant and selected_variant.id == variant.id %}checked{% endif %}>
+                    <span class="ui-variant-check"></span>
+                </label>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <span>رنگ بندی: ندارد</span>
+    {% endif %}
+</div>
+
+
+                                        <div class="product-params pt-3">
+                                            <ul data-title="ویژگی‌های محصول">
+                                                 {% if product.specs.exists %}
+          {% for spec in product.specs.all|slice:":4" %}
+    <li>{{ spec.key }}: {{ spec.value }}</li>
+{% endfor %}
+        {% else %}
+            <li>ویژگی خاصی برای این محصول ثبت نشده است.</li>
+        {% endif %}
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <div class="col=lg-6 col-md-6 col-xs-12 pr">
+                                        <div class="product-seller-info">
+                                            <div class="seller-info-changable">
+                                                <div class="product-seller-row vendor">
+                                                    <span class="title"> فروشنده:</span>
+                                                    <div class="product-name">کالامارکت</div>
+                                                </div>
+                                                <div class="product-seller-row guarantee">
+                                                    <span class="title"> گارانتی:</span>
+                                                    <div class="product-name">۱۸ ماهه کالامارکت</div>
+                                                </div>
+       
+<!-- قیمت و موجودی (با selected_variant) -->
+<!-- قیمت -->
+<div class="product-seller-row price">
+    <span class="title"> قیمت:</span>
+    <div class="product-name">
+        {% if product.discount_percent %}
+            <span class="text-success fw-bold fs-4" id="product-price">
+                {{ product.discounted_price|floatformat:"0"|intcomma }}
+            </span>
+        {% else %}
+            <span id="product-price">
+                {{ product.price|floatformat:"0"|intcomma }}
+            </span>
+        {% endif %}
+        <span> تومان </span>
+    </div>
+</div>
+
+<!-- موجودی -->
+<div class="product-seller-row price">
+    <span class="title"> موجودی:</span>
+    <div class="product-name">
+        {% if selected_variant %}
+            <span id="product-stock">{{ selected_variant.stock }}</span>
+        {% else %}
+            <span id="product-stock">{{ product.stock }}</span>
+        {% endif %}
+        عدد
+    </div>
+</div>
+
+
+
+     <!-- ====== باکس تعداد ====== -->
+<div class="product-seller-row guarantee">
+    <span class="title mt-3"> تعداد:</span>
+    <div class="quantity pl">
+        <input type="number" id="product-quantity" 
+               min="1" max="{{ remaining_stock|default:0 }}" 
+               value="1" step="1"
+               {% if remaining_stock <= 0 %}disabled{% endif %}>
+        <div class="quantity-nav">
+            <div class="quantity-button quantity-up" 
+                 {% if remaining_stock <= 0 %}style="opacity:0.4; pointer-events:none;"{% endif %}>+</div>
+            <div class="quantity-button quantity-down" 
+                 {% if remaining_stock <= 0 %}style="opacity:0.4; pointer-events:none;"{% endif %}>-</div>
+        </div>
+    </div>
+</div>
+
+<!-- ====== دکمه افزودن به سبد خرید ====== -->
+<div class="product-seller-row add-to-cart">
+    {% if remaining_stock > 0 %}
+        <button class="btn-add-to-cart btn btn-primary"
+                onclick="location.href='{% url 'catalog:add_to_cart' product.id 0 %}?color={% if selected_variant %}{{ selected_variant.id }}{% endif %}&quantity=' + document.getElementById('product-quantity').value">
+            <span class="btn-add-to-cart-txt">
+                افزودن به سبد خرید ({{ remaining_stock }} عدد باقی‌مانده)
+            </span>
+        </button>
+    {% elif stock <= 0 %}
+        <button class="btn-add-to-cart btn btn-danger" disabled>
+            <span class="btn-add-to-cart-txt">❌ ناموجود</span>
+        </button>
+    {% else %}
+        <button class="btn-add-to-cart btn btn-secondary" 
+                disabled 
+                style="opacity:0.5; pointer-events:none; cursor:not-allowed;">
+            <span class="btn-add-to-cart-txt">✅ همه موجودی در سبد خرید است</span>
+        </button>
+    {% endif %}
+</div>
+                                        
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                        
+                      
+                        <div class="product-usp">
+                            <div class="product-feature">
+                                <div class="product-feature-col">
+                                    <a href="#" class="product-feature-item">
+                                        <img src="{% static 'assets/images/page-single-product/delivery.svg'%}">
+                                        امکان تحویل
+                                        <br>
+                                        اکسپرس
+                                    </a>
+                                </div>
+                                <div class="product-feature-col">
+                                    <a href="#" class="product-feature-item">
+                                        <img src="{% static 'assets/images/page-single-product/contact-us.svg'%}">
+                                        ۷ روز هفته
+                                        <br>
+                                        ۲۴ ساعته
+                                    </a>
+                                </div>
+                                <div class="product-feature-col">
+                                    <a href="#" class="product-feature-item">
+                                        <img src="{% static 'assets/images/page-single-product/payment-terms.svg'%}">
+                                        امکان
+                                        <br>
+                                        پرداخت در محل
+                                    </a>
+                                </div>
+                                <div class="product-feature-col">
+                                    <a href="#" class="product-feature-item">
+                                        <img src="{% static 'assets/images/page-single-product/return-policy.svg'%}">
+                                        هفت روز ضمانت بازگشت کالا
+                                    </a>
+                                </div>
+                                <div class="product-feature-col">
+                                    <a href="#" class="product-feature-item">
+                                        <img src="{% static 'assets/images/page-single-product/origin-guarantee.svg'%}">
+                                        ضمانت
+                                        <br>
+                                        اصل بودن کالا
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tabs">
+                <div class="tab-box">
+                    <ul class="tab nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="Review-tab" data-toggle="tab" href="#Review" role="tab"
+                                aria-controls="Review" aria-selected="true">
+                                <i class="mdi mdi-glasses"></i>
+                                نقد و بررسی
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="Specifications-tab" data-toggle="tab" href="#Specifications"
+                                role="tab" aria-controls="Specifications" aria-selected="false">
+                                <i class="mdi mdi-format-list-checks"></i>
+                                مشخصات
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="User-comments-tab" data-toggle="tab" href="#User-comments"
+                                role="tab" aria-controls="User-comments" aria-selected="false">
+                                <i class="mdi mdi-comment-text-multiple-outline"></i>
+                                نظرات کاربران
+                            </a>
+                        </li>
+                       
+                    </ul>
+                </div>
+                <div class="col-lg">
+                    <div class="tabs-content">
+                        <div class="tab-content" id="myTabContent">
+                            <div class="tab-pane fade show active" id="Review" role="tabpanel"
+                                aria-labelledby="Review-tab">
+                                <h2 class="params-headline">نقد و بررسی اجمالی</h2>
+<section class="content-expert-summary">
+    <div class="mask pm-3">
+        <div class="mask-text">
+            {% if product.description %}
+                <p>{{ product.description }}</p>
+            {% else %}
+                <p class="text-muted">نقد و بررسی برای این محصول ثبت نشده است.</p>
+            {% endif %}
+        </div>
+        {% if product.description %}
+        <a href="#" class="mask-handler"></a>
+        <div class="shadow-box"></div>
+        {% endif %}
+    </div>
+    
+</section>
+                                <div class="content-expert-articles">
+                                    
+                                    
+                                    
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="Specifications" role="tabpanel"
+                                aria-labelledby="Specifications-tab">
+                                <article>
+                                    <h2 class="params-headline">مشخصات فنی
+    <span>{{ product.title }}</span>
+</h2>
+<section>
+   {% if product.specs.all|slice:"4:" %}
+    <ul class="params-list">
+        {% for spec in product.specs.all|slice:"4:" %}
+        <li class="params-list-item">
+            <div class="params-list-key">
+                <span class="block">{{ spec.key }}</span>
+            </div>
+            <div class="params-list-value">
+                <span class="block">{{ spec.value }}</span>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p class="text-muted">مشخصات فنی دیگری ثبت نشده است.</p>
+{% endif %}
+</section>
+                                </article>
+                            </div>
+                            <div class="tab-pane fade" id="User-comments" role="tabpanel" aria-labelledby="User-comments-tab">
+                                <div class="comments">
+                                    <h2 class="params-headline">امتیاز کاربران به
+                                        <span>{{product.title}}</span>
+                                    </h2>
+                                    <div class="comments-summary">
+                                        
+                                        <div class="col-lg-6 col-md-6 col-xs-12 pr">
+                                            <div class="comments-summary-note mt-4">
+    <h6>ثبت نظر جدید</h6>
+    <form method="post" id="review-form" action="{% url 'catalog:submit_review' %}">
+        {% csrf_token %}
+        <input type="hidden" name="product_id" value="{{ product.id }}">
+        <div class="form-group">
+    <label>امتیاز شما:</label>
+    <div class="star-rating">
+        <input type="radio" id="star5" name="rating" value="5" checked />
+        <label for="star5" title="5 ستاره">★</label>
+        
+        <input type="radio" id="star4" name="rating" value="4" />
+        <label for="star4" title="4 ستاره">★</label>
+        
+        <input type="radio" id="star3" name="rating" value="3" />
+        <label for="star3" title="3 ستاره">★</label>
+        
+        <input type="radio" id="star2" name="rating" value="2" />
+        <label for="star2" title="2 ستاره">★</label>
+        
+        <input type="radio" id="star1" name="rating" value="1" />
+        <label for="star1" title="1 ستاره">★</label>
+    </div>
+</div>
+        <div class="form-group">
+            <textarea name="comment"  class="form-control" rows="4" placeholder="نظر خود را بنویسید..." required></textarea>
+        </div>
+<button type="submit" class="btn btn-primary">ارسال نظر</button>
+    </form>
+</div>
+                                        </div>
+                                        <div class="product-comment-list">
+   <ul class="comment-list">
+    {% for review in reviews %}
+    <li style="display: flex; align-items: flex-start; padding: 15px 0; border-bottom: 1px solid #eee;">
+        <div class="col-lg-3 pr">
+            <section>
+                <div class="comments-user-shopping">{{ review.user.get_full_name|default:review.user.username }}
+                    <div class="cell-date">{{ review.persian_date }}</div>
+                </div>
+            </section>
+        </div>
+        <div class="col-lg-9 pl">
+            <div class="article">
+                <ul class="comment-text">
+                    <div class="header">
+                        <div class="product-rate pl">
+                            {% for i in "12345"|make_list %}
+                                {% if forloop.counter <= review.rating %}
+                                    <i class="fa fa-star active"></i>
+                                {% else %}
+                                    <i class="fa fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <p style="word-wrap: break-word; max-width: 100%;">{{ review.comment }}</p>
+                    </div>
+                </ul>
+            </div>
+        </div>
+    </li>
+    {% empty %}
+    <li>هنوز نظری برای این محصول ثبت نشده است.</li>
+    {% endfor %}
+</ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        
+    <!-- arshive-product---------------------->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // =========================
+    // VARIANT CHANGE (رنگ‌ها)
+    // =========================
+    const variantRadios = document.querySelectorAll('input[name="color"]');
+    const priceElement = document.getElementById('product-price');
+    const stockElement = document.getElementById('product-stock');
+    const mainImage = document.getElementById('main-product-image');
+
+    variantRadios.forEach(radio => {
+        radio.addEventListener('change', function () {
+
+            const price = this.dataset.price;
+            const stock = this.dataset.stock;
+            const image = this.dataset.image;
+
+            if (price && priceElement) {
+                priceElement.textContent = price;
+            }
+
+            if (stock && stockElement) {
+                stockElement.textContent = stock;
+            }
+
+            if (image && mainImage) {
+                mainImage.src = image;
+            }
+        });
+    });
+
+    // =========================
+    // QUANTITY CONTROL
+    // =========================
+    const qtyInput = document.getElementById('product-quantity');
+    const maxStock = {{ remaining_stock|default:0 }};
+
+    if (qtyInput) {
+
+        document.querySelector('.quantity-up')?.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            let val = parseInt(qtyInput.value) || 1;
+
+            if (val < maxStock) {
+                qtyInput.value = val + 1;
+            }
+        });
+
+        document.querySelector('.quantity-down')?.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            let val = parseInt(qtyInput.value) || 1;
+
+            if (val > 1) {
+                qtyInput.value = val - 1;
+            }
+        });
+
+        qtyInput.addEventListener('input', function () {
+
+            let val = parseInt(this.value) || 1;
+
+            if (val > maxStock) {
+                this.value = maxStock;
+                this.style.borderColor = 'red';
+                this.style.backgroundColor = '#ffe6e6';
+            } else {
+                this.style.borderColor = '#ced4da';
+                this.style.backgroundColor = '';
+            }
+        });
+    }
+
+    // =========================
+    // ADD TO CART
+    // =========================
+    window.addToCart = function () {
+
+        let qty = parseInt(document.getElementById('product-quantity')?.value) || 1;
+
+        let max = maxStock || 999999;
+
+        if (qty > max) qty = max;
+        if (qty < 1) qty = 1;
+
+        let url = "{% url 'catalog:add_to_cart' product.id 0 %}";
+
+        // variant
+        const selected = document.querySelector('input[name="color"]:checked');
+        if (selected) {
+            url += "?color=" + selected.value;
+        }
+
+        url += "&quantity=" + qty;
+
+        window.location.href = url;
+    };
+
+});
+</script>
+
+    {% endblock %}

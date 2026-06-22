@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% block title %}تسویه حساب - کالا مارکت{% endblock %}
+
+{% load humanize %}
+{% block content%}
+
+    <!-- checkout------------------------------>
+     
+    <div class="container-main">
+        <div class="d-block">
+            <section class="blog-checkout d-block order-1">
+                <div class="col-lg">
+                    <div class="checkout woocommerce-checkout">
+                        <div class="content-checkout container">
+                            <div class="notices-wrapper">
+                                <div class="col-12">
+                                    <div class="form-coupon-toggle">
+                                        
+                                        <div class="checkout-coupon form-coupon">
+                                            <p>اگر کد تخفیف دارید، لطفا وارد کنید.</p>
+                                            <form action="#" class="form-coupon">
+                                                <div class="form-row">
+                                                    <input type="text" name="coupon-code" class="checkout-discount-code"
+                                                        placeholder="کد تخفیف">
+                                                    <div class="append pl">
+                                                        <button class="btn-append btn btn-primary" type="submit">اعمال
+                                                            تخفیف</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="middle-container">
+                               <form method="POST" class="form-checkout">
+    {% csrf_token %}
+
+    <div class="col2-set" id="customer-details">
+        <div class="col-12">
+            <div class="billing-fields mt-4">
+                <h4>جزئیات صورتحساب</h4>
+                <div class="form-checkout-row">
+
+                    <!-- نام تحویل گیرنده -->
+                     {{ form.full_name.errors }}
+                    <div class="validate-required">
+                        <label for="id_full_name">نام تحویل گیرنده <abbr class="required" title="ضروری" style="color:red;">*</abbr></label>
+<input type="text" name="full_name" id="id_full_name" class="input-name-checkout form-control" value="{{ form.full_name.value|default:'' }}" required oninvalid="this.setCustomValidity('این فیلد ضروری است')" oninput="this.setCustomValidity('')">  
+                  </div>
+
+                    <!-- شماره موبایل -->
+                    <div class="validate-required">
+                        <label for="id_phone">شماره موبایل <abbr class="required" title="ضروری" style="color:red;">*</abbr></label>
+<input type="tel" name="phone" id="id_phone" class="input-name-checkout form-control text-left" 
+       value="{{ form.phone.value|default:'' }}" 
+       required 
+       pattern="09[0-9]{9}" 
+       title="شماره موبایل باید ۱۱ رقم و با 09 شروع شود">                 </div>
+
+                    <!-- کد پستی -->
+                    <div class="validate-required">
+                        <label for="id_postal_code">کد پستی <abbr class="required" title="ضروری" style="color:red;">*</abbr></label>
+<input type="text" name="postal_code" id="id_postal_code" class="input-name-checkout form-control" placeholder="کد پستی را بدون خط تیره بنویسید" value="{{ form.postal_code.value|default:'' }}" required oninvalid="this.setCustomValidity('کد پستی ضروری است')" oninput="this.setCustomValidity('')"> 
+                   </div>
+
+                    <!-- آدرس (خیابان) -->
+                    <div class="validate-required">
+                        <label for="id_address">خیابان <abbr class="required" title="ضروری" style="color:red;">*</abbr></label>
+<input type="text" name="address" id="id_address" class="input-name-checkout form-control" value="{{ form.address.value|default:'' }}" required oninvalid="this.setCustomValidity('آدرس ضروری است')" oninput="this.setCustomValidity('')">
+                    </div>
+                    <!-- توضیحات سفارش -->
+                    <label for="id_description">توضیحات سفارش
+                        <span class="optional">(اختیاری)</span>
+                    </label>
+                    <textarea name="description" id="id_description" class="textarea-name-checkout form-control" rows="5" cols="30" placeholder="یادداشت ها درباره سفارش شما ، برای مثال نکات مهم برای تحویل بار">{{ form.description.value|default:'' }}</textarea>
+
+                </div> <!-- form-checkout-row -->
+            </div> <!-- billing-fields -->
+        </div> <!-- col-12 -->
+    </div> <!-- col2-set -->
+                        
+<h3 class="order-review-heading">سفارش شما</h3>
+<div class="checkout-review-order">
+    <table class="checkout-review-order-table table table-borderless">
+        <thead>
+            <tr>
+                <th scope="col" class="product-name">محصول</th>
+                <th scope="col" class="product-price">قیمت کل</th>
+            </tr>
+        </thead>
+       <tbody>
+    {% for item in cart_items %}
+    <tr class="checkout-cart-item">
+        <td class="product-name">{{ item.product.title }} × {{ item.quantity }}</td>
+        <td class="product-price text-info">
+            {% widthratio item.price 1 item.quantity as row_total %}
+            <span class="amount">{{ row_total|floatformat:"0"|intcomma }} تومان</span>
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
+<tfoot>
+    <!-- تخفیف محصولات -->
+    {% if total_discount > 0 %}
+    <tr class="cart-discount">
+        <th>تخفیف محصولات</th>
+        <td data-title="تخفیف محصولات">
+            <div class="price">
+                <span class="amount text-success">
+                    -{{ total_discount|floatformat:"0"|intcomma }} تومان
+                </span>
+            </div>
+        </td>
+    </tr>
+    {% endif %}
+
+    <!-- تخفیف کوپن -->
+    {% if coupon_percent > 0 %}
+    <tr class="cart-discount">
+        <th>تخفیف کوپن ({{ coupon_percent }}%)</th>
+        <td data-title="تخفیف کوپن">
+            <div class="price">
+                <span class="amount text-success">
+                    -{{ coupon_discount|floatformat:"0"|intcomma }} تومان
+                </span>
+            </div>
+        </td>
+    </tr>
+    {% endif %}
+
+    <!-- مالیات -->
+    <tr class="cart-tax">
+        <th>مالیات (۹%)</th>
+        <td>
+            <span class="amount">{{ tax|floatformat:"0"|intcomma }} تومان</span>
+        </td>
+    </tr>
+
+    <!-- حمل و نقل -->
+    <tr class="order-total">
+        <th>حمل و نقل</th>
+        <td>
+            <div class="shipping-totals-item">
+                <span class="shipping-destination"></span>
+                <span class="shipping-cost">رایگان</span>
+            </div>
+        </td>
+    </tr>
+
+    <!-- مجموع نهایی قابل پرداخت -->
+    <tr class="cart-subtotal">
+        <th>مجموع قابل پرداخت</th>
+        <td>
+            <strong class="amount text-success">{{ grand_total|floatformat:"0"|intcomma }} تومان</strong>
+        </td>
+    </tr>
+</tfoot>
+    </table>
+
+    <ul class="checkout-payment-methods">
+    <li class="checkout-payment-method-item d-block">
+        <label for="payment_credit" class="outline-radio">
+            <input type="radio" name="payment_method" id="payment_credit" value="credit_wallet"
+                   {% if form.payment_method.value == 'credit_wallet' %}checked{% endif %}
+                   required
+                   oninvalid="this.setCustomValidity('لطفاً یک روش پرداخت را انتخاب کنید')"
+                   oninput="this.setCustomValidity('')">
+            <span class="outline-radio-check"></span>
+        </label>
+        <label for="payment_credit" class="shipping-totals-title-row">
+            <div class="shipping-totals-title">افزایش اعتبار و پرداخت از کیف پول</div>
+        </label>
+    </li>
+    <li class="checkout-payment-method-item d-block">
+        <label for="payment_online" class="outline-radio">
+            <input type="radio" name="payment_method" id="payment_online" value="online"
+                   {% if form.payment_method.value == 'online' %}checked{% endif %}>
+            <span class="outline-radio-check"></span>
+        </label>
+        <label for="payment_online" class="shipping-totals-title-row">
+            <div class="shipping-totals-title">پرداخت اینترنتی هوشمند</div>
+        </label>
+    </li>
+    <li class="checkout-payment-method-item d-block">
+        <label for="payment_cod" class="outline-radio">
+            <input type="radio" name="payment_method" id="payment_cod" value="cod"
+                   {% if form.payment_method.value == 'cod' %}checked{% endif %}>
+            <span class="outline-radio-check"></span>
+        </label>
+        <label for="payment_cod" class="shipping-totals-title-row">
+            <div class="shipping-totals-title">پرداخت هنگام دریافت</div>
+        </label>
+    </li>
+</ul>
+
+
+    <button class="btn-Order btn btn-primary mt-4 mb-3" type="submit">ثبت سفارش</button>
+</div>
+
+            </section>
+        </div>
+    </div>
+    <!-- checkout------------------------------>
+
+   
+{% endblock %}
+    

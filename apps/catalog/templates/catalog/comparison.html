@@ -1,0 +1,309 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}مقایسه محصولات - کالا مارکت{% endblock %}
+{% load humanize %}
+
+{% block content %}
+
+<style>
+    /* ============================================= */
+/* ۱. حذف کامل دکمه‌های اسلایدر (قبلی/بعدی و نقطه‌ها) */
+/* ============================================= */
+.product-carousel .owl-nav,
+.product-carousel .owl-dots,
+.product-carousel .owl-prev,
+.product-carousel .owl-next,
+.product-carousel button.owl-prev,
+.product-carousel button.owl-next {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* ============================================= */
+/* ۲. تبدیل اسلایدر به گرید (چند ردیفه) */
+/* ============================================= */
+.product-carousel .owl-stage-outer {
+    width: 100% !important;
+    overflow: visible !important;  /* اجازه می‌دهد محتوا در ردیف‌های بعدی دیده شود */
+}
+
+.product-carousel .owl-stage {
+    display: flex !important;
+    flex-wrap: wrap !important;    /* باعث می‌شود بعد از ۳ محصول به ردیف بعدی برود */
+    width: 100% !important;
+    transform: none !important;    /* حرکت اسلایدر را غیرفعال می‌کند */
+}
+
+/* ============================================= */
+/* ۳. تنظیم عرض هر محصول (۳ تا در هر ردیف) */
+/* ============================================= */
+.product-carousel .owl-item {
+    width: 33.333% !important;      /* ۳ تا در هر ردیف */
+    flex: 0 0 33.333% !important;
+    max-width: 33.333% !important;
+    margin: 0 !important;
+    padding: 0 10px !important;     /* فاصله افقی بین محصولات */
+    box-sizing: border-box !important;
+}
+
+/* ============================================= */
+/* ۴. یکسان کردن ارتفاع کارت‌های محصول */
+/* ============================================= */
+.product-carousel .item {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;         /* همه کارت‌ها هم قد می‌شوند */
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+    transition: 0.2s;
+}
+
+/* یکسان کردن ارتفاع تصاویر */
+.product-carousel .item img {
+    width: 100% !important;
+    height: 200px !important;        /* ارتفاع ثابت برای همه تصاویر */
+    object-fit: contain !important;  /* کل تصویر داخل کادر دیده شود (بدون بریدگی) */
+    
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* عنوان محصول: حداکثر ۲ خط و یکسان ارتفاع */
+.product-carousel .item .post-title {
+    flex-grow: 1 !important;          /* فضای اضافی رو پر می‌کند */
+    min-height: 60px !important;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;            /* حداکثر ۲ خط */
+    -webkit-box-orient: vertical;
+    margin: 10px 0 5px;
+    font-size: 14px;
+}
+
+/* بخش قیمت: ارتفاع ثابت */
+.product-carousel .item .price {
+    min-height: 50px !important;
+    margin: 5px 0 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #e53935;
+}
+
+/* چسباندن دکمه‌ها به پایین کارت */
+.product-carousel .item .actions {
+    margin-top: auto !important;
+    padding: 10px 0;
+    text-align: center;
+}
+
+
+/* فاصله بین هدر و محصولات */
+.slider-widget-products .card-header {
+    margin-bottom: 50px !important;
+}
+/* فاصله بین منو و باکس محصولات */
+.slider-widget-products {
+    margin-top: 20px !important;
+}
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 40px;
+    direction: ltr;
+}
+
+.pagination .page-item {
+    list-style: none;
+}
+
+.pagination .page-link {
+    padding: 8px 14px;
+    border-radius: 50px !important;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    color: #007bff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.pagination .page-link:hover {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    background-color: #e9ecef;
+    .product-list-container {
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.product-grid {
+    flex: 1;
+}
+
+
+}
+.product-list-container {
+    min-height: 800px;  /* عدد رو بسته به طراحی خودت تنظیم کن */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.product-grid {
+    flex: 1;
+}
+
+.pagination-wrapper {
+    margin-top: auto;  /* این مهمه - صفحه‌بندی رو مجبور می‌کنه بره پایین */
+    padding: 20px 0;
+}
+/* حذف کادر کمرنگ اطراف دکمه‌ها */
+.product-carousel .item .actions button,
+.product-carousel .item .actions a {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* حذف border شفاف/کمرنگ */
+.product-carousel .item .actions .btn {
+    border: 1px solid transparent !important;
+}
+
+/* اگر دکمه از نوع outline هست و کمرنگی میده */
+.product-carousel .item .actions .btn-outline {
+    border: 1px solid #ddd !important;
+}
+
+
+/* حذف کامل بک‌گراند */
+.product-carousel .item .actions .btn-cart {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+.btn-add-to-cart {
+    background-color: transparent !important;
+    border: none !important;
+}
+
+.btn-add-to-cart:hover {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+.btn-like {
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    font-size: 22px;
+    cursor: pointer;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+</style>
+
+
+<div class="col-lg-12 col-md-12 col-xs-12 pr order-1 d-block">
+    <div class="slider-widget-products">
+        <div class="widget widget-product card">
+            <header class="card-header">
+                <span class="title-one">مقایسه</span>
+                <h3 class="card-title"></h3>
+            </header>
+            <div class="product-carousel owl-carousel owl-theme owl-rtl">
+                {% for product in products %}
+                <div class="item">
+                    <a href="{% url 'catalog:product_detail' slug=product.slug %}" class="d-block hover-img-link">
+                        <img src="{{ product.image.url }}" class="img-fluid" alt="{{ product.title }}">
+                       <span class="icon-view">
+                                                    <strong>
+                                                        <span>مشاهده جزئیات</span>
+                                                    </strong>
+                                                </span>
+                    </a>
+                    <h2 class="post-title">
+                        <a href="">{{ product.title }}</a>
+                    </h2>
+                     <div class="price">
+    {% if product.discount_percent %}
+        <del class="text-danger me-1">{{ product.price|floatformat:"0"|intcomma }} تومان</del>
+        <ins class="text-success fw-bold">{{ product.discounted_price|floatformat:"0"|intcomma }} تومان</ins>
+        <span class="text-primary small">({{ product.discount_percent }}%)</span>
+    {% else %}
+        <ins class="fw-bold">{{ product.price|floatformat:"0"|intcomma }} تومان</ins>
+    {% endif %}
+</div>
+                  <div class="actions">
+    <ul>
+        <li class="action-item" data-product-id="{{ product.id }}">
+            <button class="btn btn-light add-product-wishes" type="button" 
+                    onclick="location.href='{% url 'catalog:toggle_wishlist' product.id %}'">
+                <i class="fa {% if product.id in liked_products %}fa-heart" style="color: red;{% else %}fa-heart-o{% endif %}"></i>
+            </button>
+        </li>
+        <li class="action-item compare">
+            <button class="btn btn-light btn-compare" type="button" data-product-id="{{ product.id }}">
+                <i class="fa fa-random"></i>
+            </button>
+        </li>
+        <li class="action-item add-to-cart">
+    <button class="btn btn-light btn-sm" 
+            {% if product.remaining_stock > 0 %}
+                onclick="location.href='{% url 'catalog:add_to_cart' product.id 0 %}?quantity=1'"
+            {% else %}
+                disabled style="pointer-events: none; cursor: not-allowed;"
+            {% endif %}>
+        <i class="fa fa-shopping-cart" 
+           style="{% if product.remaining_stock <= 0 %}color: red !important;{% endif %}"></i>
+    </button>
+</li>
+    </ul>
+</div>
+                </div>
+
+                
+               
+                {% empty %}
+<div class="empty-wishlist-message" style="min-height: 70vh; display: flex; align-items: center; justify-content: center; text-align: center;">
+    <div class="alert alert-info" style="display: inline-block; width: auto; margin: 0 auto; text-align: center;">
+        <div style="font-size: 18px; color: #555;">
+            شما هنوز محصولی به علاقه‌مندی‌ها اضافه نکرده‌اید.
+        </div>
+    </div>
+</div>
+{% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.btn-compare').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        window.location.href = "/remove-from-compare/" + this.dataset.productId + "/";
+    });
+});
+
+
+ 
+</script>
+{% endblock %}

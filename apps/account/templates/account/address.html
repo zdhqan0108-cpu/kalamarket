@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}آدرس های من - کالا مارکت{% endblock %}
+{% block content %}
+<div class="container-main">
+    <div class="d-block">
+        <section class="profile-home">
+            <div class="col-lg">
+                <div class="post-item-profile order-1 d-block">
+                    <div class="col-lg-3 col-md-3 col-xs-12 pr">
+                        <div class="sidebar-profile sidebar-navigation">
+                            <section class="profile-box">
+                                <header class="profile-box-header-inline">
+                                    <div class="profile-avatar user-avatar profile-img">
+                                        <img src="{% static 'assets/images/man.png' %}">
+                                    </div>
+                                </header>
+                                <footer class="profile-box-content-footer">
+                                    <span class="profile-box-nameuser">{{ user.username }}</span>
+                                    <span class="profile-box-registery-date">عضویت در سایت {{ jalali_joined }}</span>         
+                                    <span class="profile-box-phone">{{ user.profile.phone|default:"-" }}</span>
+                                    <div class="profile-box-tabs">
+                                        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="mdi mdi-logout-variant">خروج از حساب</a>
+                                        <form id="logout-form" method="post" action="{% url 'account:logout' %}" style="display: none;">
+                                            {% csrf_token %}
+                                        </form>
+                                    </div>
+                                </footer>
+                            </section>
+                            <section class="profile-box">
+                                <ul class="profile-account-navs">
+                                   <li class="profile-account-nav-item navigation-link-dashboard"><a href="{% url 'account:profile' %}"><i class="mdi mdi-account-outline"></i> پروفایل</a></li>
+                                    <li class="profile-account-nav-item navigation-link-dashboard"><a href="{%url 'orders:user_orders' %}"><i class="mdi mdi-cart"></i> همه سفارش ها</a></li>
+                                    <li class="profile-account-nav-item navigation-link-dashboard"><a href="{%url 'catalog:wishlist' %}"><i class="mdi mdi-heart"></i> لیست علاقه مندی</a></li>
+                                    <li class="profile-account-nav-item"><a href="{% url 'account:address' %}" class="active"><i class="mdi mdi-map-outline"></i> آدرس ها</a></li>                                    
+                                </ul>
+                            </section>
+                        </div>
+                    </div>
+                    <div class="col-lg-9 col-md-9 col-xs-12 pl">
+                        <div class="profile-content">
+                            <div class="profile-stats">
+                                
+                                <!-- فرم افزودن آدرس جدید (مثل پنل کاربری) -->
+                                <form method="post" action="{% if editing_address %}{% url 'account:address_edit' editing_address.id %}{% else %}{% url 'account:address_add' %}{% endif %}">
+    {% csrf_token %}
+    <table class="table table-profile">
+        <tbody>
+            <tr>
+                <td><div class="title">عنوان</div><div class="value"><input type="text" name="title" class="input-plain" value="{{ editing_address.title|default:'' }}" required></div></td>
+                <td><div class="title">نام و نام خانوادگی</div><div class="value"><input type="text" name="full_name" class="input-plain" value="{{ editing_address.full_name|default:'' }}" required></div></td>
+            </tr>
+            <tr>
+                <td><div class="title">شماره تماس</div><div class="value"><input type="text" name="phone" class="input-plain" value="{{ editing_address.phone|default:'' }}" required></div></td>
+                <td><div class="title">شهر</div><div class="value"><input type="text" name="city" class="input-plain" value="{{ editing_address.city|default:'' }}" required></div></td>
+            </tr>
+            <tr>
+                <td><div class="title">کد پستی</div><div class="value"><input type="text" name="postal_code" class="input-plain" value="{{ editing_address.postal_code|default:'' }}" required></div></td>
+                <td><div class="title">آدرس کامل</div><div class="value"><textarea name="address" class="input-plain" rows="2" required>{{ editing_address.address|default:'' }}</textarea></div></td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="profile-edit-action">
+        <button type="submit" class="link-spoiler-edit btn btn-secondary">ذخیره آدرس</button>
+    </div>
+</form>
+                                
+                            
+                                
+                             
+                                {% for address in addresses %}
+                                <div class="card mb-3">
+                                    <div class="card-body" style="font-family: inherit; font-size: 14px;">
+                                        <h5>{{ address.title }}</h5>
+                                        <p><strong>گیرنده:</strong> {{ address.full_name }}<br>
+                                        <strong>تلفن:</strong> {{ address.phone }}<br>
+                                        <strong>آدرس:</strong> {{ address.address }}، {{ address.city }}، کدپستی: {{ address.postal_code }}</p>
+                                        <div class="profile-edit-action">
+                                           <a href="{% url 'account:address_edit' address.id %}" class="btn btn-secondary btn-sm rounded-pill">ویرایش</a>
+<button class="delete-address-btn link-spoiler-edit btn btn-secondary rounded-pill" 
+        data-id="{{ address.id }}" 
+        data-url="{% url 'account:address_delete' address.id %}">
+    حذف
+</button>    
+                              </div>
+                                </div>
+                                {% empty %}
+                                <p>هیچ آدرسی ثبت نشده است.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<style>
+    .input-plain {
+        border: none;
+        background: transparent;
+        width: 100%;
+        padding: 5px 0;
+        font-size: inherit;
+        font-family: inherit;
+        color: inherit;
+        outline: none;
+        border-bottom: 1px solid transparent;
+    }
+    .input-plain:focus {
+        border-bottom-color: #007bff;
+    }
+    .table-profile input, .table-profile textarea {
+        background: transparent;
+        border: none;
+        width: 100%;
+    }
+    .card-body .title,
+.card-body .value {
+    font-family: inherit;
+}
+.btn-secondary, .link-spoiler-edit, .delete-address-btn {
+    border-radius: 30px !important;
+    padding: 5px 12px !important;
+}
+.profile-edit-action .btn {
+    padding: 8px 20px !important;
+    font-size: 13px !important;
+    border-radius: 50px !important;
+    line-height: 1.2 !important;
+}
+
+</style>
+<script>
+      document.querySelectorAll('.delete-address-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const url = this.dataset.url;
+            const card = this.closest('.card');
+            if (!card) return;
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    card.remove();  // این فقط همون کارت مخصوص رو حذف می‌کنه
+                    location.reload();  // این خط رو اضافه کن تا صفحه رفرش بشه
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

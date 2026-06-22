@@ -1,0 +1,577 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}سبد خرید - کالا مارکت{% endblock %}
+{% load humanize %}
+{% block content %}
+
+
+
+<style>
+    .shop-cart thead tr {
+    background: var(--theme-color);
+    color: var(--color-white)
+}
+
+.shop-cart thead tr th {
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0px
+}
+
+.shop-cart thead tr th, .shop-cart thead tr td {
+    font-family: var(--body-font);
+    white-space: nowrap
+}
+
+.shop-cart tr td {
+    font-family: var(--body-font);
+    color: var(--color-dark);
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-info-color);
+    border-top: none;
+    position: relative;
+    padding: 20px 10px;
+    font-size: 16px;
+    text-align: right;
+}
+
+.shop-cart-img {
+    width: 100px
+}
+
+.shop-cart-img img {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid var(--border-info-color)
+}
+
+.shop-cart-name {
+    font-size: 16px;
+    margin-bottom: 4px;
+    font-weight: 600
+}
+
+.shop-cart-name a:hover {
+    color: var(--theme-color)
+}
+
+.shop-cart-info p {
+    font-size: 14px;
+    color: var(--body-text-color)
+}
+
+.shop-cart-info p span {
+    font-family: var(--body-font);
+    font-weight: 500;
+    margin-left: 5px
+}
+
+.shop-cart-price {
+    font-weight: 500
+}
+
+.shop-cart-qty {
+    width: 110px
+}
+
+.shop-cart-qty button {
+    width: 30px;
+    height: 30px;
+    line-height: 28px;
+    color: var(--theme-color);
+    text-align: center;
+    border: 0;
+    border-radius: 50px;
+    background: var(--theme-bg-light)
+}
+
+.shop-cart-qty button i {
+    font-weight: 500
+}
+
+.shop-cart-qty input {
+    width: 30px;
+    border: none;
+    background: 0 0;
+    color: var(--theme-color);
+    text-align: center
+}
+
+.shop-cart-subtotal {
+    font-weight: 500
+}
+
+.shop-cart-remove {
+    font-size: 18px;
+    width: 35px;
+    height: 35px;
+    line-height: 35px;
+    border: 1px solid var(--border-info-color);
+    text-align: center;
+    border-radius: 50px
+}
+
+.shop-cart-remove:hover {
+    border-color: var(--color-red);
+    color: var(--color-red)
+}
+
+.shop-cart-footer {
+    margin-top: 20px
+}
+
+.shop-cart-coupon {
+    margin-bottom: 25px
+}
+
+.shop-cart-coupon .form-group {
+    position: relative
+}
+
+.shop-cart-coupon .form-control {
+    box-shadow: none;
+    padding: 15px 25px 15px 160px;
+    border-radius: 50px
+}
+
+.shop-cart-coupon .form-control:focus {
+    border-color: var(--theme-color)
+}
+
+.shop-cart-coupon .theme-btn {
+    font-family: var(--body-font);
+    position: absolute;
+    left: 5.4px;
+    top: 10px;
+    border-radius: 50px;
+    padding: 8px 20px
+}
+
+.shop-cart-summary {
+    padding: 30px;
+    border: 1px solid var(--border-info-color);
+    background: var(--theme-bg-light);
+    border-radius: 10px;
+    margin-top: 12px;
+    margin-right: 20px
+}
+
+.shop-cart-summary h5 {
+    margin-bottom: 25px
+}
+
+.shop-cart-summary li {
+    margin-bottom: 10px
+}
+
+.shop-cart-summary li span {
+    font-family: var(--body-font);
+    float: left
+}
+
+.shop-cart-summary li strong {
+    color: var(--color-dark2)
+}
+
+.shop-cart-total {
+    padding-top: 10px;
+    border-top: 1px solid var(--border-info-color)
+}
+
+.shop-cart-total span {
+    font-family: var(--body-font);
+    font-weight: 700;
+    color: var(--theme-color)
+}
+
+@media all and (max-width:991px) {
+    .shop-cart-summary {
+        margin-right: 0
+    }
+}
+     .slider-widget-products {
+    margin-top: 20px !important;
+    max-width:1500px;
+}
+
+
+/* برای همه دکمه‌های معمولی */
+button, .theme-btn, {
+    background-color: #28a745 !important; /* سبز */
+    border-color: #28a745 !important;
+    color: white !important;
+}
+
+/* برای دکمه‌های حذف (×) قرمز نگه دار */
+.shop-cart-remove, .remove-btn {
+    background-color: transparent !important;
+    color: #dc3545 !important;
+    border: none;
+}
+ .cart-table .table {
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 1px 5px rgba(255, 255, 255, 0.05);
+    }
+    .cart-table th {
+        font-weight: 600;
+        border-top: none;
+    }
+    .shop-cart-img img {
+        width: 60px;
+        border-radius: 8px;
+    }
+    .shop-cart-name a {
+        color: #333;
+        font-weight: 500;
+    }
+    .shop-cart-price span, .shop-cart-subtotal span {
+        color: #000100fe;
+        font-weight: bold;
+        font-size: 16px;
+    }
+    .quantity {
+        width: 60px;
+        text-align: center;
+        border: 1px solid: #000100fe;
+        border-radius: 6px;
+        padding: 5px;
+    }
+    .minus-btn, .plus-btn {
+        background: transparent;
+        border: none;
+        width: 30px;
+        height: 30px;
+        border-radius: 6px;
+        font-weight: bold;
+        transition: 0.2s;
+        outline:none;
+        box-shadow:none;
+    }
+    .minus-btn:hover, .plus-btn:hover {
+        background: #28a745;
+        color: white;
+    }
+.minus-btn:focus, .plus-btn:focus,
+.minus-btn:active, .plus-btn:active {
+    outline: none !important;           /* حذف outline در حالت کلیک و فوکوس */
+    box-shadow: none !important;        /* در صورت وجود سایه، حذف شود */
+    boder:none !important;
+}
+    .shop-cart-remove {
+        color: #dc3545;
+        font-size: 18px;
+        cursor:pointer !important;
+    }
+    .shop-cart-summary {
+        background: #faf6f6;
+        border-radius: 12px;
+        padding: 20px;
+    }
+    .shop-cart-summary h5 {
+        font-weight: bold;
+    }
+    .theme-btn {
+        background-color: #2b9a45;
+        color: white;
+        border: none;
+        padding: 8px 18px;
+        border-radius: 8px;
+        transition: 0.2s;
+    }
+    .theme-btn:hover {
+        background-color: #126524;
+        color: white;
+    }
+    .shop-cart-footer .form-control {
+        border-radius: 8px;
+        border: 1px solid #ddd;
+    }
+    @media (max-width: 768px) {
+        .cart-table .table thead {
+            display: none;
+        }
+        .cart-table .table tbody tr {
+            display: block;
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 10px;
+        }
+        .cart-table .table td {
+            display: flex;
+            justify-content: space-between;
+            text-align: right;
+            border: none;
+        }
+        .cart-table .table td:before {
+            content: attr(data-label);
+            font-weight: bold;
+            margin-left: 10px;
+        }
+    }
+.shop-cart-qty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.shop-cart-qty button {
+    width: 30px;
+    height: 30px;
+    background: transparent;
+    border:  solid #f9f7f7;
+    font-size: 20px;
+    font-weight: normal;
+    cursor: pointer;
+}
+.shop-cart-qty .quantity {
+    width: 45px;
+    text-align: center;
+    padding: 4px;
+    background: white;
+}
+ .shop-cart-remove{
+      boder-circle:1px solid #902424;
+
+}   
+.shop-cart-btn {
+    margin-top: 25px !important;
+}
+.cart-item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.shop-cart-price {
+    margin-left: 50px;
+}
+.shop-cart-qty {
+    margin-left: 20px;
+}
+.quantity {
+    width: 30px !important;   /* عرض دلخواه - می‌توانی عدد را تغییر دهی */
+    max-width: 60px;
+    text-align: center;
+}
+.cart-table th:nth-child(4) {
+    text-align: left !important;
+    padding-left:85px;
+}
+.cart-table th:nth-child(3) {
+    text-align: right !important;
+    padding-right: 35px;
+}
+
+</style>
+       
+<div class="col-lg-12 col-md-12 col-xs-12 pr order-1 d-block">
+    <div class="slider-widget-products">
+                <div class="widget widget-product card">
+
+
+        <div class="shop-cart py-100">
+    <div class="container">
+        <div class="shop-cart-wrap">
+
+            {% if not cart_items %}
+                <!-- سبد خرید خالی -->
+                <div class="text-center py-5">
+                    <i class="mdi mdi-cart-off" style="font-size: 80px; color: #ddd;"></i>
+                    <h3 class="mt-3">سبد خرید شما خالی است!</h3>
+                    <p class="text-muted">برای افزودن محصول به سبد خرید، به صفحه محصولات مراجعه کنید.</p>
+                    <a href="{% url 'catalog:product_list' %}" class="btn btn-primary rounded-pill mt-3">مشاهده محصولات</a>
+                </div>
+            {% else %}
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="cart-table">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>تصویر</th>
+                                        <th>نام محصول</th>
+                                        <th>قیمت</th>
+                                        <th>مقدار</th>
+                                        <th>مجموع فرعی</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                            
+                                                                                        {% for item in cart_items %}
+<tbody>
+    <tr>
+        <td>
+            <div class="shop-cart-img">
+                <a href="{% url 'catalog:product_detail' slug=item.slug %}">
+                    <img src="{{ item.image.url }}" alt="{{ item.name }}">
+                </a>
+            </div>
+        </td>
+        <td>
+            <div class="shop-cart-content">
+                <h5 class="shop-cart-name">
+                    <a href="{% url 'catalog:product_detail' slug=item.slug %}">{{ item.name|truncatechars:30 }}</a>
+                </h5>
+                 {% if item.color_name %}
+            <span class="text-muted small">رنگ: {{ item.color_name }}</span>
+            {%endif %}
+            </div>
+        </td>
+        <td>
+            <div class="shop-cart-price">
+                {% if item.discount_percent %}
+                    <del class="text-danger me-1">{{ item.price|floatformat:"0"|intcomma }}</del>
+                    <span class="text-success fw-bold">{{ item.discounted_price|floatformat:"0"|intcomma }}</span>
+                {% else %}
+                    <span>{{ item.price|floatformat:"0"|intcomma }}</span>
+                {% endif %}
+            </div>
+        </td>
+        <td>
+            <div class="shop-cart-qty" dir="ltr">
+                <form method="post" action="{% url 'catalog:update_cart' item.id %}" style="display: inline-flex; gap: 5px; align-items: center;">
+                    {% csrf_token %}
+                    <button type="submit" name="decrement" value="1" class="minus-btn" {% if item.quantity <= 1 %}disabled{% endif %}>-</button>
+                    <input type="number" name="quantity" value="{{ item.quantity }}" 
+                           min="1" max="{{ item.stock }}" 
+                           style="width: 60px; text-align: center;"
+                           oninput="if(parseInt(this.value) > {{ item.stock }}) { this.style.border='2px solid red'; this.style.backgroundColor='#ffe6e6'; } else { this.style.border='2px solid #ced4da'; this.style.backgroundColor=''; }"
+                           onchange="let val=parseInt(this.value); if(val>=1 && val<= {{ item.stock }}) { this.form.submit(); } else { this.value = {{ item.quantity }}; }">
+                    <button type="submit" name="increment" value="1" class="plus-btn" {% if item.quantity >= item.stock %}disabled{% endif %}>+</button>
+                </form>
+            </div>
+        </td>
+        <td>
+            <div class="shop-cart-subtotal">
+                <span>{{ item.item_total|floatformat:"0"|intcomma }} تومان</span>
+            </div>
+        </td>
+        <td>
+            <form method="post" action="{% url 'catalog:remove_from_cart' item.id %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="remove-btn" style="cursor:pointer;">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </form>
+        </td>
+    </tr>
+</tbody>
+{% endfor %}
+                                    </table>
+                                </div>
+                            </div>
+                           <div class="shop-cart-footer">
+    <div class="row">
+        <div class="col-md-7 col-lg-6">
+            <div class="shop-cart-coupon">
+                {% if request.session.coupon_applied and request.session.coupon_percent %}
+                    <!-- ====== کوپن اعمال شده ====== -->
+                    <div class="alert alert-success rounded-pill text-center">
+                        ✅ کد تخفیف با موفقیت اعمال شد.
+                        <br>
+                        <small>تخفیف {{ request.session.coupon_percent }}%</small>
+                        <form method="post" action="{% url 'catalog:remove_coupon' %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-link text-danger p-0">لغو تخفیف</button>
+                        </form>
+                    </div>
+                {% else %}
+                    <!-- ====== فرم اعمال کوپن ====== -->
+                    <form method="post" action="{% url 'catalog:apply_coupon' %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <input type="text" name="coupon_code" class="form-control" placeholder="کد کوپن شما">
+                            <button class="theme-btn" type="submit">اعمال کوپن</button>
+                        </div>
+                    </form>
+                {% endif %}
+
+                <!-- ====== نمایش پیام‌های خطا ====== -->
+                {% if messages %}
+                    <div class="mt-3">
+                        {% for message in messages %}
+                            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show rounded-pill text-center" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+                                    <div class="col-md-5 col-lg-6">
+                                        <div class="shop-cart-btn text-md-end">
+                                            <a href="{%url 'catalog:product_list' %}" class="theme-btn"> ادامه خرید <span
+                                                    class="fas fa-arrow-left"></span></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="shop-cart-summary">
+                                <h5>خلاصه سبد خرید</h5>
+                            
+                               <ul>
+    <li><strong>مجموع فرعی:</strong> <span>{{ subtotal|default:0|floatformat:"0"|intcomma }} تومان</span></li>
+    <li><strong>تخفیف محصولات:</strong> <span class="text-success">{{ total_product_discount|default:0|floatformat:"0"|intcomma }} تومان</span></li>
+    <li><strong>قیمت پس از تخفیف:</strong> <span>{{ after_product_discount|default:0|floatformat:"0"|intcomma }} تومان</span></li>
+     {% if coupon_percent %}
+    <li><strong>تخفیف کوپن ({{ coupon_percent }}%):</strong> <span class="text-success">{{ coupon_discount|default:0|floatformat:"0"|intcomma }} تومان</span></li>
+    {% endif %}
+    <li><strong>مالیات (۹%):</strong> <span>{{ tax|default:0|floatformat:"0"|intcomma }} تومان</span></li>
+    <li><strong>ارسال:</strong> <span>رایگان</span></li>
+    <li class="shop-cart-total"><strong>مجموع:</strong> <span>{{ grand_total|default:0|floatformat:"0"|intcomma }} تومان</span></li>
+</ul>
+                                <div class="text-end mt-40">
+                                    <a href="{% url 'orders:checkout' %}" class="theme-btn">اکنون تسویه حساب کنید<i
+                                            class="fas fa-arrow-left-long"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>    
+</div>   
+<script>
+function checkStock(input, maxStock) {
+    var val = parseInt(input.value) || 0;
+    if (val > maxStock) {
+        input.style.border = '2px solid red';
+        input.style.backgroundColor = '#ffe6e6';
+    } else {
+        input.style.border = '2px solid #ced4da';
+        input.style.backgroundColor = '';
+    }
+}
+
+function submitIfValid(input, maxStock, defaultValue) {
+    var val = parseInt(input.value) || 0;
+    if (val < 1) {
+        input.value = 1;
+        val = 1;
+    }
+    if (val > maxStock) {
+        input.value = maxStock;
+        val = maxStock;
+    }
+    input.style.border = '2px solid #ced4da';
+    input.style.backgroundColor = '';
+    input.form.submit();
+}
+</script>
+{% endblock %}
+
+
+

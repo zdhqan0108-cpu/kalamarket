@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}علاقه‌مندی‌ها - کالا مارکت{% endblock %}
+
+{% load humanize %}
+
+{% block content %}
+
+<style>
+    /* ============================================= */
+/* ۱. حذف کامل دکمه‌های اسلایدر (قبلی/بعدی و نقطه‌ها) */
+/* ============================================= */
+.product-carousel .owl-nav,
+.product-carousel .owl-dots,
+.product-carousel .owl-prev,
+.product-carousel .owl-next,
+.product-carousel button.owl-prev,
+.product-carousel button.owl-next {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* ============================================= */
+/* ۲. تبدیل اسلایدر به گرید (چند ردیفه) */
+/* ============================================= */
+.product-carousel .owl-stage-outer {
+    width: 100% !important;
+    overflow: visible !important;  /* اجازه می‌دهد محتوا در ردیف‌های بعدی دیده شود */
+}
+
+.product-carousel .owl-stage {
+    display: flex !important;
+    flex-wrap: wrap !important;    /* باعث می‌شود بعد از ۳ محصول به ردیف بعدی برود */
+    width: 100% !important;
+    transform: none !important;    /* حرکت اسلایدر را غیرفعال می‌کند */
+}
+
+/* ============================================= */
+/* ۳. تنظیم عرض هر محصول (۳ تا در هر ردیف) */
+/* ============================================= */
+.product-carousel .owl-item {
+    width: 33.333% !important;      /* ۳ تا در هر ردیف */
+    flex: 0 0 33.333% !important;
+    max-width: 33.333% !important;
+    margin: 0 !important;
+    padding: 0 10px !important;     /* فاصله افقی بین محصولات */
+    box-sizing: border-box !important;
+}
+
+/* ============================================= */
+/* ۴. یکسان کردن ارتفاع کارت‌های محصول */
+/* ============================================= */
+.product-carousel .item {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;         /* همه کارت‌ها هم قد می‌شوند */
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+    transition: 0.2s;
+}
+
+/* یکسان کردن ارتفاع تصاویر */
+.product-carousel .item img {
+    width: 100% !important;
+    height: 200px !important;        /* ارتفاع ثابت برای همه تصاویر */
+    object-fit: contain !important;  /* کل تصویر داخل کادر دیده شود (بدون بریدگی) */
+    
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* عنوان محصول: حداکثر ۲ خط و یکسان ارتفاع */
+.product-carousel .item .post-title {
+    flex-grow: 1 !important;          /* فضای اضافی رو پر می‌کند */
+    min-height: 60px !important;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;            /* حداکثر ۲ خط */
+    -webkit-box-orient: vertical;
+    margin: 10px 0 5px;
+    font-size: 14px;
+}
+
+/* بخش قیمت: ارتفاع ثابت */
+.product-carousel .item .price {
+    min-height: 50px !important;
+    margin: 5px 0 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #e53935;
+}
+
+/* چسباندن دکمه‌ها به پایین کارت */
+.product-carousel .item .actions {
+    margin-top: auto !important;
+    padding: 10px 0;
+    text-align: center;
+}
+
+/* استایل دکمه‌ها (اختیاری - فقط برای زیبایی) */
+.product-carousel .item .actions ul {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+.product-carousel .item .actions button {
+    background: #f5f5f5;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.product-carousel .item .actions button:hover {
+    background: #e53935;
+    color: #fff;
+}
+/* فاصله بین هدر و محصولات */
+.slider-widget-products .card-header {
+    margin-bottom: 50px !important;
+}
+/* فاصله بین منو و باکس محصولات */
+.slider-widget-products {
+    margin-top: 20px !important;
+}
+/* حذف حاشیه و قالب دکمه لایک */
+.remove-from-wishlist,
+.add-product-wishes,
+.btn-light {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+}
+
+.remove-from-wishlist:focus,
+.add-product-wishes:focus,
+.btn-light:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.remove-from-wishlist:hover,
+.add-product-wishes:hover,
+.btn-light:hover {
+    background: transparent !important;
+    border: none !important;
+}
+</style>
+
+<div class="col-lg-12 col-md-12 col-xs-12 pr order-1 d-block">
+    <div class="slider-widget-products">
+        <div class="widget widget-product card">
+            <header class="card-header">
+                <span class="title-one">علاقه‌مندی‌ها</span>
+                <h3 class="card-title"></h3>
+            </header>
+
+            {% if wishlist_items %}
+                <div class="product-carousel owl-carousel owl-theme owl-rtl">
+                    {% for item in wishlist_items %}
+                    <div class="item">
+                        <a href="{% url 'catalog:product_detail' slug=item.product.slug %}" class="d-block hover-img-link">
+                            <img src="{{ item.product.image.url }}" class="img-fluid" alt="{{ item.product.title }}">
+                            <span class="icon-view">
+                                                    <strong>
+                                                        <span>مشاهده جزئیات</span>
+                                                    </strong>
+                                                </span>
+                        </a>
+                        <h2 class="post-title">
+                            <a href="{% url 'catalog:product_detail' slug=item.product.slug %}">{{ item.product.title }}</a>
+                        </h2>
+                        <div class="price">
+    {% if item.product.discount_percent %}
+        <del class="text-muted" style="color:red;" >{{ item.product.price|floatformat:"0"|intcomma}} تومان</del>
+        <ins class= style="color:green;">{{ item.product.discounted_price|floatformat:"0"|intcomma }} تومان</ins>
+        <span class="text-primary small">({{ item.product.discount_percent }}%)</span>
+    {% else %}
+        <ins>{{ item.product.price|floatformat:"0"|intcomma }} تومان</ins>
+    {% endif %}
+</div>
+                       <div class="actions">
+                            <ul>
+                                <li class="action-item like">
+    <a href="{% url 'catalog:toggle_wishlist' item.product.id %}" class="btn btn-light">
+        <i class="fa fa-heart" style="color: red;"></i>
+    </a>
+</li>
+                                <li class="action-item compare">
+    <button class="btn btn-light btn-compare" 
+            onclick="location.href='{% url 'catalog:add_to_compare' item.product.id %}'">
+        <i class="fa fa-random" 
+           style="{% if item.product.id in compare_list %}color: #28a745 !important;{% endif %}"></i>
+    </button>
+</li>
+                                <li class="action-item add-to-cart">
+    <button class="btn btn-light btn-sm" 
+            {% if item.product.remaining_stock > 0 %}
+                onclick="location.href='{% url 'catalog:add_to_cart' item.product.id 0 %}?quantity=1'"
+            {% else %}
+                disabled style="pointer-events: none;"
+            {% endif %}>
+        <i class="fa fa-shopping-cart" 
+           style="{% if item.product.remaining_stock <= 0 %}color: red !important;{% endif %}"></i>
+    </button>
+</li>
+                            </ul>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-wishlist-message" style="min-height: 70vh; display: flex; align-items: center; justify-content: center; text-align: center;">
+                    <div class="alert alert-info" style="display: inline-block; width: auto;">
+                        <div style="font-size: 18px; color: #555;">
+                            شما هنوز محصولی به علاقه‌مندی‌ها اضافه نکرده‌اید.
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function removeFromWishlist(productId, button) {
+    const productItem = button.closest('.item');
+    
+    fetch('/wishlist/toggle/' + productId + '/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ product_id: productId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'removed') {
+            if (productItem) productItem.remove();
+            if (document.querySelectorAll('.item').length === 0) {
+                location.reload();
+            }
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
+{% endblock %}
