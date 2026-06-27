@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.utils import timezone
 from .forms import CheckoutForm
 from .models import Order, OrderItem
-from apps.catalog.models import Product,ProductVariant
+from apps.catalog.models import Product,ProductVariant,ProductDiscount
 from django.db.models import F
 from apps.orders.forms import CheckoutForm
 
@@ -160,6 +160,7 @@ def checkout_complate_buy(request, order_id):
 
 def user_orders(request):
         return render(request, 'orders/user_orders.html')
+
 
 
 

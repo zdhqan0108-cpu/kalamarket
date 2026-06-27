@@ -840,4 +840,3 @@ def wishlist(request):
 
     return render(request, 'catalog/wishlist.html', {'wishlist_items': wishlist_items,"liked_products":liked_products, 'compare_list': compare_list,})
 
-
